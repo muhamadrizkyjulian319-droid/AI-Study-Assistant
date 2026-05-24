@@ -1,0 +1,8 @@
+{
+  "name": "AI Study Assistant",
+  "description": "Asisten belajar digital cerdas dengan AI PDF Summarizer, AI Quiz Generator (satu demi satu), AI Tutor (Bahasa santai anak SMA), dan AI Learning Roadmap.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
