@@ -45,12 +45,32 @@ export const Tutor: React.FC<TutorProps> = ({
         }),
       });
 
+      const responseText = await response.text();
+
       if (!response.ok) {
-        const errJson = await response.json();
-        throw new Error(errJson.error || "Gagal berkomunikasi dengan AI Tutor.");
+        let errMessage = "Aduh brosis, gagal kirim chat ke Kakak Tutor nih.";
+        try {
+          const errJson = JSON.parse(responseText);
+          errMessage = errJson.error || errMessage;
+        } catch {
+          if (responseText.includes("GEMINI_API_KEY") || responseText.includes("apiKey") || responseText.includes("API key")) {
+            errMessage = "GEMINI_API_KEY belum terkonfigurasi. Silakan tambahkan API key di panel Secrets.";
+          } else if (responseText.includes("<!DOCTYPE html>") || responseText.toLowerCase().includes("<html")) {
+            errMessage = "Koneksi server gagal (Server mengembalikan halaman HTML). Pastikan server aktif dan GEMINI_API_KEY di panel Secrets sudah benar.";
+          } else {
+            errMessage = `Server error (${response.status}): ${responseText.substring(0, 150)}`;
+          }
+        }
+        throw new Error(errMessage);
       }
 
-      const data = await response.json();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error("Respon server bukan format JSON yang valid (Kemungkinan server belum siap atau sedang restart).");
+      }
+
       const aiMsg: ChatMessage = { role: "model", text: data.result };
       onAddChatMessage(aiMsg);
     } catch (err: any) {
